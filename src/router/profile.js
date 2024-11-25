@@ -22,14 +22,14 @@ profileRouter.post("/profile/edit", userAuth, async (req, res) => {
     try {
 
         if (!validateEditProfile(req)) {
-            throw new Error("editing password is not allowed")
+            throw new Error("editing profile is not allowed")
         }
 
         const loggedInUser = req.user
         Object.keys(req.body).forEach((key) => loggedInUser[key] = req.body[key])
 
         await loggedInUser.save()
-        res.send(`${loggedInUser.firstName} update succesfull`)
+        res.send(`${loggedInUser.firstName} your profile is updated succesfully`)
 
     } catch (err) {
         res.status(400).send("ERROR:" + err.message)
