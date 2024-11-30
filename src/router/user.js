@@ -58,6 +58,7 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
         limit = limit > 50 ? 50 : limit
         const skip = (page - 1) * limit
 
+        // finding the request which we have sent
         const connectionRequests = await ConnectionRequest.find({
             $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser.id }]
         }).select('fromUserId toUserId')
