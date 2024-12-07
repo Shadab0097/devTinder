@@ -3,6 +3,8 @@ const { passwordEncryption } = require('../utils/validator')
 const Admin = require('../models/admin')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const adminAuth = require('../middlewares/adminAuth')
+const User = require('../models/user')
 
 
 const adminRouter = express.Router()
@@ -83,6 +85,17 @@ adminRouter.post('/admin/logout', async (req, res) => {
     res.cookie('adminToken', null, { expires: new Date(Date.now()) })
 
     res.send('admin logout successfully')
+})
+
+adminRouter.get('/admin/getalluser', adminAuth, async (req, res) => {
+    try {
+        const loggedInAdmin = req.loggedInAdmin
+        const allUsers = await User.find({})
+        res.json({ allUsers })
+
+    } catch (err) {
+        res.status(400).send("ERROR" + err.message)
+    }
 })
 
 module.exports = adminRouter
