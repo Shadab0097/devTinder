@@ -20,7 +20,7 @@ const passwordEncryption = (password, saltRound) => {
 }
 
 const validateEditProfile = (req) => {
-    const updateAllowed = ["firstName", "lastName", "about", "skills", "photoUrl", "gender"]
+    const updateAllowed = ["firstName", "lastName", "about", "skills", "photoUrl", "gender", "age"]
 
     const isUpdateAllowed = Object.keys(req.body).every((key) => updateAllowed.includes(key))
 
