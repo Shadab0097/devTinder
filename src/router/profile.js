@@ -15,7 +15,6 @@ const profileRouter = express.Router()
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
     try {
         const user = req.user
-        console.log(user)
         res.send(user)
 
     } catch (err) {
@@ -59,7 +58,6 @@ profileRouter.post("/profile/forgot/password", async (req, res) => {
         // find the user if he present in db
 
         const findUserByEmail = await User.findOne({ emailId: emailFromUser })
-        console.log(findUserByEmail)
 
         if (!findUserByEmail) {
             throw new Error('email is not registered')

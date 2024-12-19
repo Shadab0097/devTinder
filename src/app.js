@@ -18,6 +18,7 @@ const { profileRouter } = require('./router/profile')
 const { requestRouter } = require('./router/request')
 const userRouter = require("./router/user")
 const adminRouter = require("./router/admin")
+const connectionProfileRouter = require('./router/connectionProfile')
 
 
 app.use('/', authRouter)
@@ -25,6 +26,8 @@ app.use('/', profileRouter)
 app.use('/', requestRouter)
 app.use('/', userRouter)
 app.use('/', adminRouter)
+app.use('/', connectionProfileRouter)
+
 
 
 
