@@ -5,8 +5,9 @@ const { validate } = require('../models/user')
 const validator = require('validator')
 const User = require("../models/user")
 const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
 
-
+const otpStore = {};
 
 
 
@@ -62,6 +63,54 @@ profileRouter.post("/profile/forgot/password", async (req, res) => {
         if (!findUserByEmail) {
             throw new Error('email is not registered')
         }
+
+        function generateOTP() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+        const createOtp = generateOTP()
+
+        otpStore[emailFromUser] = createOtp
+
+        const tranpoter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+                user: "devtinder100@gmail.com",
+                pass: "ddkh tige lula myea"
+            },
+        })
+
+        const mailOption = {
+            from: "devtinder100@gmail.com",
+            to: emailFromUser,
+            subject: "Password Reset OTP",
+            text: `Your OTP for password reset is: ${createOtp}`
+        }
+
+
+        await tranpoter.sendMail(mailOption)
+
+        res.send("OTP sent to your email. Please verify it to reset password")
+
+
+    } catch (err) {
+        res.status(400).send("ERROR:" + err.message)
+    }
+})
+
+profileRouter.post('/profile/otp/verify', async (req, res) => {
+    try {
+        const { emailId, otp } = req.body
+
+        // Check if OTP exists and matches
+        if (otpStore[emailId] !== otp) {
+            throw new Error("Invalid OTP");
+        }
+
+        const findUserByEmail = await User.findOne({ emailId });
+        if (!findUserByEmail) {
+            throw new Error("User not found");
+        }
+
         const oldPasswordHash = findUserByEmail.password
 
         // getting new password from user
@@ -72,23 +121,27 @@ profileRouter.post("/profile/forgot/password", async (req, res) => {
 
         //throwing error if passwor dis same as before
         if (comparePassword) {
-            throw new Error('please write something different now That you can remember ')
+            throw new Error('please write something different now ')
         }
 
         // validating password if comparePassword is false
         const newPasswordValid = await validateEditPassword(req)
+
+
 
         //changing old password into new password
         findUserByEmail.password = newPasswordValid
 
         // saving user into dataBase
         await findUserByEmail.save()
+        delete otpStore[emailId];
 
         // logging Out user
         res.cookie('token', null, { expires: new Date(Date.now()) })
 
         // sending response to user
         res.send("password updated successfully, please login again")
+
     } catch (err) {
         res.status(400).send("ERROR:" + err.message)
     }
