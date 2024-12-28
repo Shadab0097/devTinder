@@ -71,23 +71,26 @@ profileRouter.post("/profile/forgot/password", async (req, res) => {
 
         otpStore[emailFromUser] = createOtp
 
-        const tranpoter = nodemailer.createTransport({
-            service: 'Gmail',
+
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.hostinger.com',
+            port: 465,
+            secure: true,
             auth: {
-                user: "devtinder100@gmail.com",
-                pass: "ddkh tige lula myea"
-            },
+                user: 'support@devtinder.site',
+                pass: 'Dev@7229.#'
+            }
         })
 
         const mailOption = {
-            from: "devtinder100@gmail.com",
+            from: "support@devtinder.site",
             to: emailFromUser,
             subject: "Password Reset OTP",
             text: `Your OTP for password reset is: ${createOtp}`
         }
 
 
-        await tranpoter.sendMail(mailOption)
+        await transporter.sendMail(mailOption)
 
         res.send("OTP sent to your email. Please verify it to reset password")
 
