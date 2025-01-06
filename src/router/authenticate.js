@@ -18,51 +18,72 @@ authRouter.post("/signup", async (req, res) => {
         // password encryption
         const passwordHash = await passwordEncryption(password, 10)
 
-        emailExistence.check(emailId, async (error, response) => {
-            if (error) {
-                res.status(400).send('please use existing email')
-                return
-            }
 
+        const emailValid = await new Promise((resolve, reject) => {
 
-            if (response) {
-                const user = new User({
-                    emailId,
-                    firstName,
-                    lastName,
-                    password: passwordHash
-                })
+            emailExistence.check(emailId, async (error, response) => {
 
+                if (error) {
+                    return res.status(400).send('please use existing email')
 
-                const savedUser = await user.save()
-                const token = jwt.sign({ emailId: savedUser.emailId }, "SHADAB@Tinder$9711", { expiresIn: '1h' })
-                // console.log(token)
-
-
-
-                const transporter = nodemailer.createTransport({
-                    host: 'smtp.hostinger.com',
-                    port: 465,
-                    secure: true,
-                    auth: {
-                        user: 'account@devtinder.site',
-                        pass: 'Dev@7229.#'
-                    }
-                })
-
-                const verificationUrl = `http://localhost:2000/verify-email/${token}`
-
-                const mailOption = {
-                    from: 'account@devtinder.site',
-                    to: emailId,
-                    subject: 'Verify Your Email',
-                    html: `<p>Please verify your email by clicking <a href="${verificationUrl}">here</a>.</p>`,
                 }
 
-                await transporter.sendMail(mailOption)
-                res.status(201).json({ message: 'Signup successful! Please verify your email.' });
+                resolve(response)
+            })
+
+            setTimeout(() => {
+                reject(new Error('Email validation timeout.'))
+            }, 5000)
+        })
+
+        if (!emailValid) {
+            return res.status(400).send('Invalid or non-existent email. Please use a valid email address.');
+        }
+
+        // const savedUser = await user.save()
+        const token = jwt.sign({
+            emailId,
+            firstName,
+            lastName,
+            password: passwordHash
+        }, "SHADAB@Tinder$9711", { expiresIn: '1h' })
+        // console.log(token)
+
+
+
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.hostinger.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: 'account@devtinder.site',
+                pass: 'Dev@7229.#'
             }
         })
+
+        const verificationUrl = `http://localhost:2000/verify-email/${token}`
+
+        const mailOption = {
+            from: 'account@devtinder.site',
+            to: emailId,
+            subject: 'Verify Your Email',
+            html: `
+             <div style="max-width: 28rem; width: 100%; background-color:rgb(143, 182, 245); border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 2rem; text-align: center; font-family: Arial, sans-serif;">
+            <div style="width: 3rem; height: 3rem; margin: 0 auto 1rem; color: #3b82f6;">
+                <h1> 👩🏿‍💻Dev Tinder </h1>
+            </div>
+            <h1 style="font-size: 1.5rem; font-weight: bold; color: #1f2937; margin-bottom: 0.75rem;">Verify your email</h1>
+            <p style="color: #4b5563; margin-bottom: 0.5rem;">We've sent a verification link to:</p>
+            <p style="color: #3b82f6; font-weight: 500; margin-bottom: 1rem;">${emailId}</p>
+            <p style="font-size: 0.875rem; color: #9ca3af;">Please verify your email by clicking <a href="${verificationUrl}">here</a>.</p>
+        </div>
+            
+`,
+        }
+
+        await transporter.sendMail(mailOption)
+        res.status(201).json({ message: 'Signup successful! Please verify your email.' });
+
 
 
         // send the cookie back to user
@@ -71,7 +92,7 @@ authRouter.post("/signup", async (req, res) => {
         // res.json({ message: "User Saves successfully", data: savedUser })
 
     } catch (err) {
-        res.status(400).send("error while signing Up " + err.message)
+        res.status(400).send(err.message)
     }
 
 })
@@ -83,23 +104,35 @@ authRouter.get('/verify-email/:token', async (req, res) => {
 
         const decodeObj = jwt.verify(token, "SHADAB@Tinder$9711")
 
-        const { emailId } = decodeObj
-        const user = await User.findOne({ emailId: emailId })
+        const { emailId,
+            firstName,
+            lastName,
+            password: passwordHash } = decodeObj
+
+        const existingUser = await User.findOne({ emailId });
+        if (existingUser) {
+            return res.status(400).send('Email already verified or user already exists.');
+        }
+
+        const user = new User({
+            emailId,
+            firstName,
+            lastName,
+            password: passwordHash,
+            isVerified: true
+        })
+
+        await user.save();
 
         if (!user) {
             return res.status(404).send('User not found.');
         }
 
-        if (user.isVerified) {
-            return res.status(400).send('Email already verified.');
-        }
-        user.isVerified = true;
-        await user.save();
 
         res.send('Email verified successfully. You can close this tab now.');
 
     } catch (err) {
-        res.status(400).send("error while Signing Up " + err.message)
+        res.status(400).send(err.message)
     }
 })
 
@@ -109,12 +142,11 @@ authRouter.post('/login', async (req, res) => {
         const user = await User.findOne({ emailId: emailId })
 
         if (!user) {
-            throw new Error("invalid Credentials")
+            res.status(400).send('User not found or not verified. Please verify your email first.')
+            return
         }
 
-        if (!user.isVerified) {
-            return res.status(400).send('please verify your Email first')
-        }
+
         const isPasswordValid = await user.validatePassword(password)
 
         if (isPasswordValid) {
@@ -129,7 +161,7 @@ authRouter.post('/login', async (req, res) => {
             throw new Error("invalid Credentials")
         }
     } catch (err) {
-        res.status(400).send("error while Login " + err.message)
+        res.status(400).send(err.message)
     }
 })
 authRouter.post('/logout', async (req, res) => {

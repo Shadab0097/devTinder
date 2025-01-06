@@ -63,11 +63,14 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
             $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser.id }]
         }).select('fromUserId toUserId')
 
+        // const unVerifiedUser = await User.find({ isVerified: !isVerified })
         const hideUserfromFeed = new Set()
 
         connectionRequests.forEach(req => {
             hideUserfromFeed.add(req.fromUserId.toString())
             hideUserfromFeed.add(req.toUserId.toString())
+            // hideUserfromFeed.add(unVerifiedUser)
+
 
         });
 

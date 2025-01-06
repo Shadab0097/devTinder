@@ -86,7 +86,12 @@ profileRouter.post("/profile/forgot/password", async (req, res) => {
             from: "support@devtinder.site",
             to: emailFromUser,
             subject: "Password Reset OTP",
-            text: `Your OTP for password reset is: ${createOtp}`
+            html: `<div style="max-width: 28rem; width: 100%; background-color:rgb(184, 208, 246); border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 2rem; text-align: center; font-family: Arial, sans-serif;">
+            <h1 style="font-size: 1.5rem; font-weight: bold; color:rgb(9, 12, 16); margin-bottom: 0.75rem;">One Time Password</h1>
+            <p style="color:rgb(57, 76, 103); margin-bottom: 0.5rem;">We've sent a OTP  to:</p>
+            <p style="color: #3b82f6; font-weight: 500; margin-bottom: 1rem;">${emailFromUser}</p>
+            <p style="font-size: 0.875rem; color: #9ca3af;"> Your OTP for password reset is: ${createOtp}.</p>
+        </div>`
         }
 
 
@@ -96,7 +101,7 @@ profileRouter.post("/profile/forgot/password", async (req, res) => {
 
 
     } catch (err) {
-        res.status(400).send("ERROR:" + err.message)
+        res.status(400).send(err.message)
     }
 })
 
