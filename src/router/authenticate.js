@@ -3,7 +3,6 @@ const User = require("../models/user")
 const { validateSignupData, passwordEncryption } = require('../utils/validator')
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
-const emailExistence = require('email-existence');
 const axios = require('axios')
 
 const authRouter = express.Router()
