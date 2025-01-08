@@ -4,6 +4,7 @@ const { validateSignupData, passwordEncryption } = require('../utils/validator')
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 const emailExistence = require('email-existence');
+const axios = require('axios')
 
 const authRouter = express.Router()
 
@@ -19,24 +20,30 @@ authRouter.post("/signup", async (req, res) => {
         const passwordHash = await passwordEncryption(password, 10)
 
 
-        const emailValid = await new Promise((resolve, reject) => {
+        // const emailValid = await new Promise((resolve, reject) => {
 
-            emailExistence.check(emailId, async (error, response) => {
+        //     emailExistence.check(emailId, async (error, response) => {
 
-                if (error) {
-                    return res.status(400).send('please use existing email')
+        //         if (error) {
+        //             return res.status(400).send('please use existing email')
 
-                }
+        //         }
 
-                resolve(response)
-            })
+        //         resolve(response)
+        //     })
 
-            setTimeout(() => {
-                reject(new Error('Email validation timeout.'))
-            }, 5000)
-        })
+        //     setTimeout(() => {
+        //         reject(new Error('Email validation timeout.'))
+        //     }, 5000)
+        // })
 
-        if (!emailValid) {
+        const emailValid = await axios
+            .get(`https://api.hunter.io/v2/email-verifier?email=${emailId}&api_key=fcd597b6944ea07416425141fc0812310ee5ed21`)
+
+        const emailData = await emailValid.data
+        // console.log(emailData)
+
+        if (emailData?.data?.status !== 'accept_all') {
             return res.status(400).send('Invalid or non-existent email. Please use a valid email address.');
         }
 
@@ -61,7 +68,7 @@ authRouter.post("/signup", async (req, res) => {
             }
         })
 
-        const verificationUrl = `http://localhost:2000/verify-email/${token}`
+        const verificationUrl = `http://devtinder.site/verify-email/${token}`
 
         const mailOption = {
             from: 'account@devtinder.site',
@@ -69,7 +76,7 @@ authRouter.post("/signup", async (req, res) => {
             subject: 'Verify Your Email',
             html: `
              <div style="max-width: 28rem; width: 100%; background-color:rgb(143, 182, 245); border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 2rem; text-align: center; font-family: Arial, sans-serif;">
-            <div style="width: 3rem; height: 3rem; margin: 0 auto 1rem; color: #3b82f6;">
+            <div style=" margin: 0 auto 1rem; color: #3b82f6;">
                 <h1> 👩🏿‍💻Dev Tinder </h1>
             </div>
             <h1 style="font-size: 1.5rem; font-weight: bold; color: #1f2937; margin-bottom: 0.75rem;">Verify your email</h1>
