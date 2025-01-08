@@ -66,8 +66,10 @@ authRouter.post("/signup", async (req, res) => {
                 pass: 'Dev@7229.#'
             }
         })
+        // http://localhost:5173/
+        const verificationUrl = `http://54.221.105.202/verify-email/${token}`
+        // const verificationUrl = ` http://localhost:5173/verify-email/${token}`
 
-        const verificationUrl = `http://devtinder.site/verify-email/${token}`
 
         const mailOption = {
             from: 'account@devtinder.site',
