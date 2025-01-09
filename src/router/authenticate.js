@@ -67,7 +67,7 @@ authRouter.post("/signup", async (req, res) => {
             }
         })
         // http://localhost:5173/
-        const verificationUrl = `/api/verify-email/${token}`
+        const verificationUrl = `api/verify-email/${token}`
         // const verificationUrl = `http://localhost:2000/verify-email/${token}`
 
 
