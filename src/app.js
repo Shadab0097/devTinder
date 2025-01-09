@@ -2,11 +2,12 @@ const express = require("express");
 const connectDB = require('./config/database');
 const cookieParser = require("cookie-parser");
 const cors = require('cors');
+const path = require('path')
 
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://devtinder.site',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true
 }));
@@ -29,6 +30,13 @@ app.use('/', userRouter);
 app.use('/', adminRouter);
 app.use('/', connectionProfileRouter);
 
+// Serve static files from React's build folder
+app.use(express.static(path.join(__dirname, "build")));
+
+// Catch-all route for React frontend
+app.use((req, res) => {
+    res.sendFile(path.resolve(__dirname, "build", "index.html"));
+});
 
 connectDB().then(() => {
     console.log('Database connected successfully');
