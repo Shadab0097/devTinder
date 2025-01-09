@@ -67,7 +67,7 @@ authRouter.post("/signup", async (req, res) => {
             }
         })
         // http://localhost:5173/
-        const verificationUrl = `http://devtinder.site/verify-email/${token}`
+        const verificationUrl = `http://54.221.105.202/api/verify-email/${token}`
         // const verificationUrl = `http://localhost:2000/verify-email/${token}`
 
 
