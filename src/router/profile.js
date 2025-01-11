@@ -78,7 +78,7 @@ profileRouter.post("/profile/forgot/password", async (req, res) => {
             secure: true,
             auth: {
                 user: 'support@devtinder.site',
-                pass: 'Dev@7229.#'
+                pass: process.env.EMAIL_PASS
             }
         })
 

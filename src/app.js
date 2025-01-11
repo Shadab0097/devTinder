@@ -2,9 +2,9 @@ const express = require("express");
 const connectDB = require('./config/database');
 const cookieParser = require("cookie-parser");
 const cors = require('cors');
-
-
 const app = express();
+
+require("dotenv").config();
 
 app.use(cors({
     origin: 'https://devtinder.site',
@@ -34,7 +34,7 @@ app.use('/', connectionProfileRouter);
 connectDB().then(() => {
     console.log('Database connected successfully');
 
-    app.listen(2000, () => console.log("Server is running on port 2000"));
+    app.listen(process.env.PORT, () => console.log("Server is running on port 2000"));
 }).catch((err) => {
     console.log(err.message + ' - DB Error while connecting');
 });

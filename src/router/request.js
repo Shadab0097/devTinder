@@ -56,7 +56,7 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
             secure: true,
             auth: {
                 user: 'connectionrequest@devtinder.site',
-                pass: 'Dev@7229.#'
+                pass: process.env.EMAIL_PASS
             }
         })
 

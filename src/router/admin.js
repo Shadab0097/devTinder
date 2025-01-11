@@ -58,7 +58,7 @@ adminRouter.post('/admin/login', async (req, res) => {
 
         if (isAdminPasswordValid) {
 
-            const adminToken = await jwt.sign({ _id: findAdmin._id }, "AdminToken@7229", { expiresIn: '1d' })
+            const adminToken = await jwt.sign({ _id: findAdmin._id }, process.env.ADMIN_JWT_SECRET, { expiresIn: '1d' })
 
             res.cookie('adminToken', adminToken, { expires: new Date(Date.now() + 8 * 3600000) })
 

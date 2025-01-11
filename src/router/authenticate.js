@@ -52,7 +52,7 @@ authRouter.post("/signup", async (req, res) => {
             firstName,
             lastName,
             password: passwordHash
-        }, "SHADAB@Tinder$9711", { expiresIn: '1h' })
+        }, process.env.JWT_SECRET, { expiresIn: '1h' })
         // console.log(token)
 
 
@@ -63,7 +63,7 @@ authRouter.post("/signup", async (req, res) => {
             secure: true,
             auth: {
                 user: 'account@devtinder.site',
-                pass: 'Dev@7229.#'
+                pass: process.env.EMAIL_PASS
             }
         })
         // http://localhost:5173/
@@ -110,7 +110,7 @@ authRouter.get('/verify-email/:token', async (req, res) => {
         const { token } = req.params
 
 
-        const decodeObj = jwt.verify(token, "SHADAB@Tinder$9711")
+        const decodeObj = jwt.verify(token, process.env.JWT_SECRET)
 
         const { emailId,
             firstName,

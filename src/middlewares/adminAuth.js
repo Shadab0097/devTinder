@@ -11,7 +11,7 @@ const adminAuth = async (req, res, next) => {
             throw new Error('invalid credentils Admin')
         }
 
-        const decodeAdminObj = await jwt.verify(adminToken, "AdminToken@7229")
+        const decodeAdminObj = await jwt.verify(adminToken, process.env.ADMIN_JWT_SECRET)
 
         const { _id } = decodeAdminObj
 
