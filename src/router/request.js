@@ -108,6 +108,7 @@ requestRouter.post("/request/review/:status/:requestId", userAuth, async (req, r
     try {
         const loggedInUser = req.user
         const { status, requestId } = req.params
+        // console.log(fromUserId)
 
         const allowedStatus = ["accepted", "rejected"]
 
@@ -122,13 +123,23 @@ requestRouter.post("/request/review/:status/:requestId", userAuth, async (req, r
             status: "interested"
         })
 
+        const findUser = await User.findOne({ _id: connectionRequestFind.fromUserId })
+        // console.log(connectionRequestFind.fromUserId)
+        console.log(findUser)
         if (!connectionRequestFind) {
             return res.status(404).send("connectionRequest not found")
         }
 
         connectionRequestFind.status = status
 
+
+
         const data = await connectionRequestFind.save()
+
+        // if (status === 'accepted') {
+        //     const emailRes = await sendEmails.run("Connection Request Accepted By " + loggedInUser.firstName)
+
+        // }
 
         res.json({ message: "connection request" + status, data })
     } catch (err) {

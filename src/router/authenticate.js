@@ -4,6 +4,8 @@ const { validateSignupData, passwordEncryption } = require('../utils/validator')
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 const axios = require('axios')
+const sendEmails = require("../utils/sendEmail")
+
 
 const authRouter = express.Router()
 
@@ -90,7 +92,11 @@ authRouter.post("/signup", async (req, res) => {
         }
 
         await transporter.sendMail(mailOption)
+        const emailRes = await sendEmails.run(`Cheif ${firstName} Signs Up on DevTinder with  ${emailId} `)
         res.status(201).json({ message: 'Signup successful! Please verify your email.' });
+
+
+
 
 
 
