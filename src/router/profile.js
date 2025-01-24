@@ -115,17 +115,22 @@ profileRouter.post('/profile/otp/verify', async (req, res) => {
         }
 
         const findUserByEmail = await User.findOne({ emailId });
+        if (findUserByEmail.emailId !== emailId) {
+            throw new Error('Invalid Email')
+        }
         if (!findUserByEmail) {
             throw new Error("User not found");
         }
 
+
         const oldPasswordHash = findUserByEmail.password
 
         // getting new password from user
-        const newPassword = req.body.password
+        const newPassword = req.body.password.trim()
 
         //comparing newPassword with oldPasswordHash
         const comparePassword = await bcrypt.compare(newPassword, oldPasswordHash)
+
 
         //throwing error if passwor dis same as before
         if (comparePassword) {
@@ -151,7 +156,7 @@ profileRouter.post('/profile/otp/verify', async (req, res) => {
         res.send("password updated successfully, please login again")
 
     } catch (err) {
-        res.status(400).send("ERROR:" + err.message)
+        res.status(400).send(err.message)
     }
 })
 

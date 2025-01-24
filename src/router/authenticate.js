@@ -17,8 +17,9 @@ authRouter.post("/signup", async (req, res) => {
         //validate data
         validateSignupData(req)
         const { password, emailId, firstName, lastName } = req.body
+        const trimmedPassword = password.trim();
         // password encryption
-        const passwordHash = await passwordEncryption(password, 10)
+        const passwordHash = await passwordEncryption(trimmedPassword, 10)
 
 
         // const emailValid = await new Promise((resolve, reject) => {
@@ -92,6 +93,7 @@ authRouter.post("/signup", async (req, res) => {
         }
 
         await transporter.sendMail(mailOption)
+
         const emailRes = await sendEmails.run(`Cheif ${firstName} Signs Up on DevTinder with  ${emailId} `)
         res.status(201).json({ message: 'Signup successful! Please verify your email.' });
 
