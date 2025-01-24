@@ -71,7 +71,6 @@ profileRouter.post("/profile/forgot/password", async (req, res) => {
 
         otpStore[emailFromUser] = createOtp
 
-
         const transporter = nodemailer.createTransport({
             host: 'smtp.hostinger.com',
             port: 465,
@@ -109,8 +108,11 @@ profileRouter.post('/profile/otp/verify', async (req, res) => {
     try {
         const { emailId, otp } = req.body
 
+        const trimOtp = otp.trim()
+
+
         // Check if OTP exists and matches
-        if (otpStore[emailId] !== otp) {
+        if (otpStore[emailId] !== trimOtp) {
             throw new Error("Invalid OTP");
         }
 
@@ -126,7 +128,7 @@ profileRouter.post('/profile/otp/verify', async (req, res) => {
         const oldPasswordHash = findUserByEmail.password
 
         // getting new password from user
-        const newPassword = req.body.password.trim()
+        const newPassword = req.body.password
 
         //comparing newPassword with oldPasswordHash
         const comparePassword = await bcrypt.compare(newPassword, oldPasswordHash)
