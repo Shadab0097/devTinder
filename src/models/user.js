@@ -36,8 +36,8 @@ const userSchema = new mongoose.Schema({
             if (!validator.isStrongPassword(value)) {
                 throw new Error("write a strong password")
             }
-        },
-        trim: true,
+        }
+
 
     },
     age: {
