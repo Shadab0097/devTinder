@@ -21,6 +21,8 @@ const { requestRouter } = require('./router/request');
 const userRouter = require("./router/user");
 const adminRouter = require("./router/admin");
 const connectionProfileRouter = require('./router/connectionProfile');
+const paymentRouter = require("./router/payment");
+
 
 // Use routers
 app.use('/', authRouter);
@@ -29,6 +31,8 @@ app.use('/', requestRouter);
 app.use('/', userRouter);
 app.use('/', adminRouter);
 app.use('/', connectionProfileRouter);
+app.use('/', paymentRouter);
+
 
 
 connectDB().then(() => {
