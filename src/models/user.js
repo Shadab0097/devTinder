@@ -77,7 +77,7 @@ const userSchema = new mongoose.Schema({
         default: false
     },
     isPremium: {
-        type: String,
+        type: Boolean,
         default: false
     },
     membershipType: {
