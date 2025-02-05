@@ -78,6 +78,7 @@ paymentRouter.post('/payment/webhook', async (req, res) => {
         if (paymentDetails.status === "captured") { // Success
             user.isPremium = true;
             user.membershipType = payment.notes.membershipType;
+            await user.save()
         } else { // Failure or any other status
             user.isPremium = false;
             user.membershipType = null;
