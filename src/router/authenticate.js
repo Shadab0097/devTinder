@@ -40,12 +40,13 @@ authRouter.post("/signup", async (req, res) => {
         // })
 
         const emailValid = await axios
-            .get(`https://api.hunter.io/v2/email-verifier?email=${emailId}&api_key=fcd597b6944ea07416425141fc0812310ee5ed21`)
+            .get(`https://api.hunter.io/v2/email-verifier?email=${emailId}&api_key=${process.env.HUNTER_IO_API_KEY}`)
 
         const emailData = await emailValid.data
         // console.log(emailData)
 
-        if (emailData?.data?.status !== 'accept_all') {
+
+        if (emailData?.data?.status !== 'valid') {
             return res.status(400).send('Invalid or non-existent email. Please use a valid email address.');
         }
 
@@ -70,7 +71,9 @@ authRouter.post("/signup", async (req, res) => {
             }
         })
         // http://localhost:5173/
-        const verificationUrl = `http://54.221.105.202/api/verify-email/${token}`
+        const verificationUrl = `https://devtinder.site/api/verify-email/${token}`
+        // const verificationUrl = `http://54.221.105.202/api/verify-email/${token}`
+
         // const verificationUrl = `http://localhost:2000/verify-email/${token}`
 
 

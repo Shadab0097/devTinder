@@ -3,6 +3,7 @@ const connectDB = require('./config/database');
 const cookieParser = require("cookie-parser");
 const cors = require('cors');
 const app = express();
+const http = require('http')
 
 require("dotenv").config();
 
@@ -22,6 +23,8 @@ const userRouter = require("./router/user");
 const adminRouter = require("./router/admin");
 const connectionProfileRouter = require('./router/connectionProfile');
 const paymentRouter = require("./router/payment");
+const initializeSocket = require("./utils/socket");
+const chatRouter = require("./router/chats");
 
 
 // Use routers
@@ -32,13 +35,17 @@ app.use('/', userRouter);
 app.use('/', adminRouter);
 app.use('/', connectionProfileRouter);
 app.use('/', paymentRouter);
+app.use('/', chatRouter)
+
+const server = http.createServer(app)
+initializeSocket(server)
 
 
 
 connectDB().then(() => {
     console.log('Database connected successfully');
 
-    app.listen(process.env.PORT, () => console.log("Server is running on port 2000"));
+    server.listen(process.env.PORT, () => console.log("Server is running on port 2000"));
 }).catch((err) => {
     console.log(err.message + ' - DB Error while connecting');
 });

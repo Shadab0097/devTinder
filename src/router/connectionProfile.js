@@ -32,7 +32,8 @@ connectionProfileRouter.get("/connection/view/profile", userAuth, async (req, re
                 about: connectionProfile.about,
                 skills: connectionProfile.skills,
                 age: connectionProfile.age,
-                gender: connectionProfile.gender
+                gender: connectionProfile.gender,
+                isPremium: connectionProfile.isPremium,
             }
         })
 

@@ -5,7 +5,7 @@ const User = require('../models/user')
 
 const userRouter = express.Router()
 
-const USER_DATA = ['firstName', 'lastName', 'photoUrl', 'about', 'skills', 'age', 'gender', 'emailId']
+const USER_DATA = ['firstName', 'lastName', 'photoUrl', 'about', 'skills', 'age', 'gender', 'emailId', 'isPremium']
 
 userRouter.get("/user/request/recieved", userAuth, async (req, res) => {
     try {
