@@ -6,12 +6,20 @@ const validator = require('validator')
 const User = require("../models/user")
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
+const multer = require('multer')
+const path = require('path')
+// const app = express();
+
+
+
 
 const otpStore = {};
 
 
 
 const profileRouter = express.Router()
+
+
 
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
     try {
@@ -23,7 +31,26 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
     }
 })
 
-profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'src/images')
+
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname))
+    }
+
+})
+
+const upload = multer({
+    storage: storage
+})
+
+
+
+
+
+profileRouter.patch("/profile/edit", upload.single('file'), userAuth, async (req, res) => {
     try {
 
         if (!validateEditProfile(req)) {
@@ -32,6 +59,12 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
         const loggedInUser = req.user
         Object.keys(req.body).forEach((key) => loggedInUser[key] = req.body[key])
+
+        if (req.file && req.file.filename) {
+            loggedInUser.photoUrl = req.file.filename;
+        }
+
+
 
         await loggedInUser.save()
         res.json({
@@ -43,7 +76,23 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
         res.status(400).send("ERROR:" + err.message)
     }
 
+
 })
+
+// profileRouter.patch("/upload", upload.single('file'), userAuth, async (req, res) => {
+//     try {
+
+//         const loggedInUser = req.user
+//         loggedInUser.photoUrl = String(req.file.filename);
+//         await loggedInUser.save()
+//         res.json(loggedInUser)
+//     } catch (err) {
+//         console.log(err)
+//     }
+// })
+
+
+
 
 profileRouter.post("/profile/forgot/password", async (req, res) => {
     try {

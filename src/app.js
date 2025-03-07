@@ -4,6 +4,8 @@ const cookieParser = require("cookie-parser");
 const cors = require('cors');
 const app = express();
 const http = require('http')
+const path = require('path')
+
 
 require("dotenv").config();
 
@@ -14,6 +16,9 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/images', express.static(path.join(__dirname, 'images')));
+// app.use(express.static('src'))
+
 
 // Import routers
 const { authRouter } = require('./router/authenticate');
@@ -36,6 +41,7 @@ app.use('/', adminRouter);
 app.use('/', connectionProfileRouter);
 app.use('/', paymentRouter);
 app.use('/', chatRouter)
+
 
 const server = http.createServer(app)
 initializeSocket(server)

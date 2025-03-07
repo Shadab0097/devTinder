@@ -5,7 +5,7 @@ const User = require('../models/user')
 
 const userRouter = express.Router()
 
-const USER_DATA = ['firstName', 'lastName', 'photoUrl', 'about', 'skills', 'age', 'gender', 'emailId', 'isPremium']
+const USER_DATA = ['firstName', 'lastName', 'photoUrl', 'about', 'skills', 'age', 'gender', 'emailId', 'isPremium', 'isOnline']
 
 userRouter.get("/user/request/recieved", userAuth, async (req, res) => {
     try {
@@ -89,5 +89,22 @@ userRouter.get("/user/feed", userAuth, async (req, res) => {
     }
 })
 
+userRouter.get("/user/:targetUserId", userAuth, async (req, res) => {
+    try {
+        const targetId = req.params.targetUserId
+
+        const user = await User.findById({ _id: targetId })
+
+        if (!user) {
+            return new Error('user not found')
+        }
+
+        res.json(user)
+    } catch (err) {
+        res.status(400).send("Error" + err.message)
+
+    }
+
+})
 
 module.exports = userRouter
