@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const multer = require('multer')
 const path = require('path')
+const sharp = require('sharp')
 // const app = express();
 
 
@@ -60,17 +61,32 @@ profileRouter.patch("/profile/edit", upload.single('file'), userAuth, async (req
         const loggedInUser = req.user
         Object.keys(req.body).forEach((key) => loggedInUser[key] = req.body[key])
 
+
+
+        // if (req.file && req.file.filename) {
+        //     loggedInUser.photoUrl = req.file.filename;
+        // }
+
         if (req.file && req.file.filename) {
-            loggedInUser.photoUrl = req.file.filename;
+            const compressedImagePath = path.join('src/images', 'compressed_' + req.file.filename);
+            await sharp(req.file.path)
+                .resize(800) // Resize image to 800px width, maintaining aspect ratio
+                .jpeg({ quality: 70 }) // Compress image to 70% quality
+                .toFile(compressedImagePath);
+
+            loggedInUser.photoUrl = 'compressed_' + req.file.filename;
         }
 
 
+
+        console.log(req.file.filename)
 
         await loggedInUser.save()
         res.json({
             message: `${loggedInUser.firstName} your profile is updated succesfully`,
             data: loggedInUser
         })
+        console.log('Absolute path:', path.resolve(__dirname, 'images'));
 
     } catch (err) {
         res.status(400).send("ERROR:" + err.message)
