@@ -76,24 +76,24 @@ profileRouter.patch("/profile/edit", upload.single('file'), userAuth, async (req
             const outputFormat = path.extname(req.file.originalname).slice(1).toLowerCase();
 
             // Compress the image based on its format
-            const image = sharp(inputPath).resize(800); // Resize to 800px width
+            const image = sharp(inputPath).resize(500); // Resize to 800px width
 
             switch (outputFormat) {
                 case 'jpeg':
                 case 'jpg':
-                    image.jpeg({ quality: 60 }); // Compress JPEG to 80% quality
+                    image.jpeg({ quality: 40 }); // Compress JPEG to 80% quality
                     break;
                 case 'png':
                     image.png({ compressionLevel: 9 }); // Compress PNG (0-9, 9 is highest compression)
                     break;
                 case 'webp':
-                    image.webp({ quality: 60 }); // Compress WebP to 80% quality
+                    image.webp({ quality: 40 }); // Compress WebP to 80% quality
                     break;
                 case 'gif':
                     image.gif(); // GIF compression is limited, but you can resize
                     break;
                 case 'tiff':
-                    image.tiff({ quality: 60 }); // Compress TIFF to 80% quality
+                    image.tiff({ quality: 40 }); // Compress TIFF to 80% quality
                     break;
                 default:
                     throw new Error("Unsupported image format");
