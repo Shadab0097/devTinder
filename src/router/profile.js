@@ -44,7 +44,8 @@ const storage = multer.diskStorage({
 })
 
 const upload = multer({
-    storage: storage
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }
 })
 
 
@@ -68,18 +69,44 @@ profileRouter.patch("/profile/edit", upload.single('file'), userAuth, async (req
         // }
 
         if (req.file && req.file.filename) {
-            const compressedImagePath = path.join('src/images', 'compressed_' + req.file.filename);
-            await sharp(req.file.path)
-                .resize(800) // Resize image to 800px width, maintaining aspect ratio
-                .jpeg({ quality: 70 }) // Compress image to 70% quality
-                .toFile(compressedImagePath);
+            const inputPath = req.file.path;
+            const outputPath = path.join('src/images', 'compressed_' + req.file.filename);
+
+            // Determine the output format based on the input file extension
+            const outputFormat = path.extname(req.file.originalname).slice(1).toLowerCase();
+
+            // Compress the image based on its format
+            const image = sharp(inputPath).resize(800); // Resize to 800px width
+
+            switch (outputFormat) {
+                case 'jpeg':
+                case 'jpg':
+                    image.jpeg({ quality: 60 }); // Compress JPEG to 80% quality
+                    break;
+                case 'png':
+                    image.png({ compressionLevel: 9 }); // Compress PNG (0-9, 9 is highest compression)
+                    break;
+                case 'webp':
+                    image.webp({ quality: 60 }); // Compress WebP to 80% quality
+                    break;
+                case 'gif':
+                    image.gif(); // GIF compression is limited, but you can resize
+                    break;
+                case 'tiff':
+                    image.tiff({ quality: 60 }); // Compress TIFF to 80% quality
+                    break;
+                default:
+                    throw new Error("Unsupported image format");
+            }
+
+            // Save the compressed image
+            await image.toFile(outputPath);
 
             loggedInUser.photoUrl = 'compressed_' + req.file.filename;
         }
 
 
-
-        console.log(req.file.filename)
+        // console.log(req.file.filename)
 
         await loggedInUser.save()
         res.json({
